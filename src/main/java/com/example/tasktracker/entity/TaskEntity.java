@@ -1,6 +1,7 @@
 package com.example.tasktracker.entity;
 
 import com.example.tasktracker.model.TaskStatus;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
@@ -22,7 +23,9 @@ public class TaskEntity {
 	private String id;
 	private String name;
 	private String description;
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "UTC")
 	private Instant createdAt;
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "UTC")
 	private Instant updatedAt;
 	private TaskStatus status;
 	private String authorId;
