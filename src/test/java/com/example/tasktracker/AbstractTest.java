@@ -14,6 +14,7 @@ import java.time.temporal.ChronoField;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
@@ -22,7 +23,6 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.testcontainers.containers.MongoDBContainer;
-import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 @SpringBootTest
@@ -30,9 +30,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @AutoConfigureWebTestClient
 public class AbstractTest {
 
-	@Container
-	static MongoDBContainer mongoDBContainer = new MongoDBContainer("mongo:6.0.8")
-			.withReuse(true);
+	static MongoDBContainer mongoDBContainer;
 
 	@DynamicPropertySource
 	static void setProperties(DynamicPropertyRegistry registry) {
@@ -55,6 +53,13 @@ public class AbstractTest {
 
 	protected TaskEntity taskEntity1;
 	protected TaskEntity taskEntity2;
+
+	@BeforeAll
+	static void setUpContainer() {
+		mongoDBContainer = new MongoDBContainer("mongo:6.0.8")
+				.withReuse(true);
+		mongoDBContainer.start();
+	}
 
 	@BeforeEach
 	public void setup() {
