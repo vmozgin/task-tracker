@@ -4,9 +4,11 @@ import com.example.tasktracker.model.ObserverRequest;
 import com.example.tasktracker.model.Task;
 import com.example.tasktracker.model.TaskRequest;
 import com.example.tasktracker.model.TaskStatus;
+import java.util.Base64;
 import java.util.Set;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.test.context.support.WithMockUser;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -38,18 +40,17 @@ public class TaskControllerTest extends AbstractTest{
 	}
 
 	@Test
-	@WithMockUser(username = "user", roles = {"MANAGER"})
 	public void whenCreateTask_thenSaveInDataBase() {
 		TaskRequest request = new TaskRequest(
 				"create_name",
 				"create_description",
 				TaskStatus.IN_PROGRESS,
-				"1",
 				"2"
 		);
 
 		webTestClient.post()
 				.uri("/api/task")
+				.header(HttpHeaders.AUTHORIZATION, "Basic " + Base64.getEncoder().encodeToString("test_user1:test_user1".getBytes()))
 				.body(Mono.just(request), Task.class)
 				.exchange()
 				.expectStatus().isOk()
@@ -59,28 +60,27 @@ public class TaskControllerTest extends AbstractTest{
 					Assertions.assertThat(response.getName()).isEqualTo(request.getName());
 					Assertions.assertThat(response.getDescription()).isEqualTo(request.getDescription());
 					Assertions.assertThat(response.getStatus()).isEqualTo(request.getStatus());
-					Assertions.assertThat(response.getAuthorId()).isEqualTo(request.getAuthorId());
+					Assertions.assertThat(response.getAuthorId()).isEqualTo(userEntity1.getId());
 					Assertions.assertThat(response.getAssigneeId()).isEqualTo(request.getAssigneeId());
 				});
 
-		StepVerifier.create(taskRepository.save(taskMapper.taskRequestToTaskEntity(request)))
+		StepVerifier.create(taskRepository.save(taskMapper.taskRequestToTaskEntity(request, userEntity1.getId())))
 				.expectNextCount(1L)
 				.verifyComplete();
 	}
 
 	@Test
-	@WithMockUser(username = "user", roles = {"MANAGER"})
 	public void whenUpdateTask_thenReturnUpdatedItem() {
 		TaskRequest updateTaskRequest = new TaskRequest(
 				"update_name",
 				"update_description",
 				TaskStatus.IN_PROGRESS,
-				"1",
 				"2"
 		);
 
 		webTestClient.put()
 				.uri("/api/task/{id}", taskEntity1.getId())
+				.header(HttpHeaders.AUTHORIZATION, "Basic " + Base64.getEncoder().encodeToString("test_user1:test_user1".getBytes()))
 				.body(Mono.just(updateTaskRequest), TaskRequest.class)
 				.exchange()
 				.expectStatus().isOk()
@@ -90,7 +90,7 @@ public class TaskControllerTest extends AbstractTest{
 					Assertions.assertThat(updatedTask.getName()).isEqualTo(updateTaskRequest.getName());
 					Assertions.assertThat(updatedTask.getDescription()).isEqualTo(updateTaskRequest.getDescription());
 					Assertions.assertThat(updatedTask.getStatus()).isEqualTo(updateTaskRequest.getStatus());
-					Assertions.assertThat(updatedTask.getAuthorId()).isEqualTo(updateTaskRequest.getAuthorId());
+					Assertions.assertThat(updatedTask.getAuthorId()).isEqualTo(userEntity1.getId());
 					Assertions.assertThat(updatedTask.getAssigneeId()).isEqualTo(updateTaskRequest.getAssigneeId());
 				});
 

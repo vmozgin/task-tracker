@@ -4,10 +4,12 @@ import com.example.tasktracker.mapper.TaskMapper;
 import com.example.tasktracker.model.ObserverRequest;
 import com.example.tasktracker.model.Task;
 import com.example.tasktracker.model.TaskRequest;
+import com.example.tasktracker.security.AppUserPrincipal;
 import com.example.tasktracker.service.TaskService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,8 +31,9 @@ public class TaskController {
 
 	@PostMapping
 	@PreAuthorize("hasAnyRole('ROLE_MANAGER')")
-	public Mono<ResponseEntity<Task>> create(@RequestBody TaskRequest request) {
-		return taskService.create(taskMapper.taskRequestToTaskEntity(request))
+	public Mono<ResponseEntity<Task>> create(@RequestBody TaskRequest request, @AuthenticationPrincipal
+			AppUserPrincipal userDetails) {
+		return taskService.create(taskMapper.taskRequestToTaskEntity(request, userDetails.getId()))
 				.map(taskMapper::taskEntityToTask)
 				.map(ResponseEntity::ok);
 	}
@@ -58,8 +61,10 @@ public class TaskController {
 
 	@PutMapping("{id}")
 	@PreAuthorize("hasAnyRole('ROLE_MANAGER')")
-	public Mono<ResponseEntity<Task>> updateById(@PathVariable("id") String taskId, @RequestBody TaskRequest request) {
-		return taskService.update(taskId, request)
+	public Mono<ResponseEntity<Task>> updateById(@PathVariable("id") String taskId,
+												 @RequestBody TaskRequest request,
+												 @AuthenticationPrincipal AppUserPrincipal userDetails) {
+		return taskService.update(taskId, request, userDetails.getId())
 				.map(taskMapper::taskEntityToTask)
 				.map(ResponseEntity::ok);
 	}

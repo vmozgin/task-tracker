@@ -84,16 +84,16 @@ public class TaskService {
 				.then();
 	}
 
-	public Mono<TaskEntity> update(String taskId, TaskRequest request) {
-		return userRepository.findById(request.getAuthorId())
-				.switchIfEmpty(Mono.error(new UserNotFoundException(String.format("Пользователь с authorId = %s не найден", request.getAuthorId()))))
+	public Mono<TaskEntity> update(String taskId, TaskRequest request, String authorId) {
+		return userRepository.findById(authorId)
+				.switchIfEmpty(Mono.error(new UserNotFoundException(String.format("Пользователь с authorId = %s не найден", authorId))))
 				.flatMap(assignee -> userRepository.findById(request.getAssigneeId())
 						.switchIfEmpty(Mono.error(new UserNotFoundException(String.format("Пользователь с assigneeId = %s не найден", request.getAssigneeId()))))
 						.flatMap(oldTask -> taskRepository.findById(taskId)
 								.flatMap(taskForUpdate -> {
 									taskForUpdate.setName(request.getName());
 									taskForUpdate.setAssigneeId(request.getAssigneeId());
-									taskForUpdate.setAuthorId(request.getAuthorId());
+									taskForUpdate.setAuthorId(authorId);
 									taskForUpdate.setDescription(request.getDescription());
 									taskForUpdate.setStatus(request.getStatus());
 									taskForUpdate.setUpdatedAt(Instant.now());

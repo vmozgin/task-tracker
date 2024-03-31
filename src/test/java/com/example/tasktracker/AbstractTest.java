@@ -20,6 +20,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -49,17 +51,17 @@ public class AbstractTest {
 	@Autowired
 	protected UserMapper userMapper;
 
+	protected PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
 	protected UserEntity userEntity1 = new UserEntity(
 			"1",
 			"test_user1",
-			"test_email1",
-			"test_user1",
+			"test_email1", passwordEncoder.encode("test_user1"),
 			Set.of(RoleType.ROLE_USER, RoleType.ROLE_MANAGER));
 	protected UserEntity userEntity2 = new UserEntity(
 			"2",
 			"test_user2",
-			"test_email2",
-			"test_user2",
+			"test_email2", passwordEncoder.encode("test_user2"),
 			Set.of(RoleType.ROLE_USER, RoleType.ROLE_MANAGER));
 
 	protected TaskEntity taskEntity1;

@@ -9,7 +9,7 @@ import org.mapstruct.ReportingPolicy;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = {UserMapper.class})
 public interface TaskMapper {
 
-	TaskEntity taskRequestToTaskEntity(TaskRequest request);
+	TaskEntity taskRequestToTaskEntity(TaskRequest request, String authorId);
 
 	Task taskEntityToTask(TaskEntity entity);
 }

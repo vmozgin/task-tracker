@@ -11,6 +11,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 public class AppUserPrincipal implements UserDetails {
 
 	private final UserEntity user;
+	private final String id;
+
+	public AppUserPrincipal(UserEntity user) {
+		this.user = user;
+		this.id = user.getId();
+	}
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -25,6 +31,10 @@ public class AppUserPrincipal implements UserDetails {
 	@Override
 	public String getUsername() {
 		return user.getUsername();
+	}
+
+	public String getId() {
+		return id;
 	}
 
 	@Override
