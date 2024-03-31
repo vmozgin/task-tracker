@@ -1,5 +1,6 @@
 package com.example.tasktracker;
 
+import com.example.tasktracker.entity.RoleType;
 import com.example.tasktracker.entity.TaskEntity;
 import com.example.tasktracker.entity.UserEntity;
 import com.example.tasktracker.mapper.TaskMapper;
@@ -48,8 +49,18 @@ public class AbstractTest {
 	@Autowired
 	protected UserMapper userMapper;
 
-	protected UserEntity userEntity1 = new UserEntity("1", "test_user1", "test_email1");
-	protected UserEntity userEntity2 = new UserEntity("2","test_user2", "test_email2");
+	protected UserEntity userEntity1 = new UserEntity(
+			"1",
+			"test_user1",
+			"test_email1",
+			"test_user1",
+			Set.of(RoleType.ROLE_USER, RoleType.ROLE_MANAGER));
+	protected UserEntity userEntity2 = new UserEntity(
+			"2",
+			"test_user2",
+			"test_email2",
+			"test_user2",
+			Set.of(RoleType.ROLE_USER, RoleType.ROLE_MANAGER));
 
 	protected TaskEntity taskEntity1;
 	protected TaskEntity taskEntity2;

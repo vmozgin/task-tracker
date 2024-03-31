@@ -3,6 +3,7 @@ package com.example.tasktracker.service;
 import com.example.tasktracker.entity.UserEntity;
 import com.example.tasktracker.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -12,12 +13,14 @@ import reactor.core.publisher.Mono;
 public class UserService {
 
 	private final UserRepository userRepository;
+	private final PasswordEncoder passwordEncoder;
 
 	public Flux<UserEntity> findAll() {
 		return userRepository.findAll();
 	}
 
 	public Mono<UserEntity> create(UserEntity entity) {
+		entity.setPassword(passwordEncoder.encode(entity.getPassword()));
 		return userRepository.save(entity);
 	}
 
@@ -30,6 +33,8 @@ public class UserService {
 				.flatMap(entityForUpdate -> {
 					entityForUpdate.setEmail(entity.getEmail());
 					entityForUpdate.setUsername(entity.getUsername());
+					entityForUpdate.setPassword(entity.getPassword());
+					entityForUpdate.setRoles(entity.getRoles());
 
 					return userRepository.save(entityForUpdate);
 				});
@@ -37,5 +42,9 @@ public class UserService {
 
 	public Mono<Void> deleteById(String id) {
 		return userRepository.deleteById(id);
+	}
+
+	public Mono<UserEntity> findByUsername(String username) {
+		return userRepository.findByUsername(username);
 	}
 }

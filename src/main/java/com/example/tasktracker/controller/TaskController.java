@@ -7,6 +7,7 @@ import com.example.tasktracker.model.TaskRequest;
 import com.example.tasktracker.service.TaskService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,6 +28,7 @@ public class TaskController {
 	private final TaskMapper taskMapper;
 
 	@PostMapping
+	@PreAuthorize("hasAnyRole('ROLE_MANAGER')")
 	public Mono<ResponseEntity<Task>> create(@RequestBody TaskRequest request) {
 		return taskService.create(taskMapper.taskRequestToTaskEntity(request))
 				.map(taskMapper::taskEntityToTask)
@@ -34,11 +36,13 @@ public class TaskController {
 	}
 
 	@GetMapping
+	@PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_MANAGER')")
 	public Flux<Task> findAll() {
 		return taskService.findAll().map(taskMapper::taskEntityToTask);
 	}
 
 	@GetMapping("{id}")
+	@PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_MANAGER')")
 	public Mono<ResponseEntity<Task>> findById(@PathVariable String id) {
 		return taskService.findById(id)
 				.map(taskMapper::taskEntityToTask)
@@ -46,12 +50,14 @@ public class TaskController {
 	}
 
 	@PostMapping("/observer/add/{taskId}")
+	@PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_MANAGER')")
 	public Mono<ResponseEntity<Void>> addObserver(@PathVariable String taskId, @RequestBody ObserverRequest request) {
 		return taskService.addObserver(taskId, request.getObserverId())
 				.map(ResponseEntity::ok);
 	}
 
 	@PutMapping("{id}")
+	@PreAuthorize("hasAnyRole('ROLE_MANAGER')")
 	public Mono<ResponseEntity<Task>> updateById(@PathVariable("id") String taskId, @RequestBody TaskRequest request) {
 		return taskService.update(taskId, request)
 				.map(taskMapper::taskEntityToTask)
@@ -59,6 +65,7 @@ public class TaskController {
 	}
 
 	@DeleteMapping("{id}")
+	@PreAuthorize("hasAnyRole('ROLE_MANAGER')")
 	public Mono<ResponseEntity<Void>> deleteById(@PathVariable("id") String taskId) {
 		return taskService.delete(taskId)
 				.map(ResponseEntity::ok);

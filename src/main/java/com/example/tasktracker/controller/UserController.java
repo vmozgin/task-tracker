@@ -6,6 +6,7 @@ import com.example.tasktracker.model.UserRequest;
 import com.example.tasktracker.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,6 +27,7 @@ public class UserController {
 	private final UserMapper userMapper;
 
 	@GetMapping
+	@PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_MANAGER')")
 	public Flux<User> findAll() {
 		return userService.findAll()
 				.map(userMapper::userEntityToUser);
@@ -39,6 +41,7 @@ public class UserController {
 	}
 
 	@GetMapping("{id}")
+	@PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_MANAGER')")
 	public Mono<ResponseEntity<User>> findById(@PathVariable String id) {
 		return userService.findById(id)
 				.map(userMapper::userEntityToUser)
@@ -47,6 +50,7 @@ public class UserController {
 	}
 
 	@PutMapping("{id}")
+	@PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_MANAGER')")
 	public Mono<ResponseEntity<User>> update(
 			@PathVariable String id,
 			@RequestBody UserRequest request
@@ -58,6 +62,7 @@ public class UserController {
 	}
 
 	@DeleteMapping("{id}")
+	@PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_MANAGER')")
 	public Mono<Void> delete(@PathVariable String id) {
 		return userService.deleteById(id);
 	}

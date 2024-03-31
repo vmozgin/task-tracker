@@ -7,12 +7,14 @@ import com.example.tasktracker.model.TaskStatus;
 import java.util.Set;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.test.context.support.WithMockUser;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 public class TaskControllerTest extends AbstractTest{
 
 	@Test
+	@WithMockUser(username = "user")
 	public void thenGetAll_thenReturnTasks() {
 		webTestClient.get()
 				.uri("/api/task")
@@ -25,6 +27,7 @@ public class TaskControllerTest extends AbstractTest{
 	}
 
 	@Test
+	@WithMockUser(username = "user")
 	public void whenGetById_thenReturnTask() {
 		webTestClient.get()
 				.uri("/api/task/{id}", taskEntity2.getId())
@@ -35,6 +38,7 @@ public class TaskControllerTest extends AbstractTest{
 	}
 
 	@Test
+	@WithMockUser(username = "user", roles = {"MANAGER"})
 	public void whenCreateTask_thenSaveInDataBase() {
 		TaskRequest request = new TaskRequest(
 				"create_name",
@@ -65,6 +69,7 @@ public class TaskControllerTest extends AbstractTest{
 	}
 
 	@Test
+	@WithMockUser(username = "user", roles = {"MANAGER"})
 	public void whenUpdateTask_thenReturnUpdatedItem() {
 		TaskRequest updateTaskRequest = new TaskRequest(
 				"update_name",
@@ -98,6 +103,7 @@ public class TaskControllerTest extends AbstractTest{
 	}
 
 	@Test
+	@WithMockUser(username = "user", roles = {"MANAGER"})
 	public void whenDeleteTask_thenRemoveFromDatabase() {
 		webTestClient.delete()
 				.uri("/api/task/{id}", taskEntity1.getId())
@@ -111,6 +117,7 @@ public class TaskControllerTest extends AbstractTest{
 	}
 
 	@Test
+	@WithMockUser(username = "user")
 	public void whenAddObserver_thenSaveInDatabase() {
 		ObserverRequest request = new ObserverRequest(userEntity1.getId());
 
